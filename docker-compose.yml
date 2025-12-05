@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: hunnit-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: product_assist
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: hunnit-backend
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/product_assist
+      EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
+      CHROMA_DB_DIR: /app/chroma_db
+      BACKEND_CORS_ORIGINS: "[\"http://localhost:4173\", \"http://hunnit-frontend:4173\"]"
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/app/chroma_db
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: hunnit-frontend
+    depends_on:
+      - backend
+    environment:
+      VITE_BACKEND_URL: "http://hunnit-backend:8000"
+    ports:
+      - "4173:4173"
+
+volumes:
+  postgres_data:
+  chroma_data:
