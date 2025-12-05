@@ -105,7 +105,7 @@ This will spin up PostgreSQL, the FastAPI backend, and the React frontend in con
                               ▼
                        ┌─────────────────┐
                        │   OpenAI LLM    │
-                       │   (optional)    │
+                       │                 │
                        └─────────────────┘
 ```
 
